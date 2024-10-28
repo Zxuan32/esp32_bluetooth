@@ -54,11 +54,13 @@ class BlueController extends ChangeNotifier {
   Future<void> connectToDevice(BluetoothDevice device) async {
     // Aquí intentamos conectar al dispositivo
     try {
+      // ignore: unused_local_variable
       BluetoothConnection connection = await BluetoothConnection.toAddress(device.address);
       connectedDevice = device;
       isConnected = true; // Actualizar el estado de conexión
       notifyListeners();
     } catch (error) {
+      // ignore: avoid_print
       print('Error al conectar: $error');
       isConnected = false; // Actualizar el estado de conexión
       notifyListeners();
