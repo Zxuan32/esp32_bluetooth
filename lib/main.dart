@@ -1,77 +1,73 @@
 import 'package:flutter/material.dart';
+import 'blank_page.dart';
+import 'led_control_page.dart';
+import 'bluetooth_home.dart';
 import 'blue_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => BlueController(),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => BlueController(),
-      child: const MaterialApp(
-        title: 'Bluetooth App',
-        debugShowCheckedModeBanner: false,
-        home: BluetoothHome(),
-      ),
+    return const MaterialApp(
+      title: 'Bluetooth App',
+      debugShowCheckedModeBanner: false,
+      home: NavigationBar(),
     );
   }
 }
 
-class BluetoothHome extends StatelessWidget {
-  const BluetoothHome({super.key});
+class NavigationBar extends StatefulWidget {
+  const NavigationBar({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _NavigationBarState createState() => _NavigationBarState();
+}
+
+class _NavigationBarState extends State<NavigationBar> {
+  int _selectedIndex = 0; // Variable para controlar el índice seleccionado
+
+  final List<Widget> _pages = const [
+    BluetoothHome(),
+    LedControlPage(),
+    BlankPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // Actualizar el índice seleccionado
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<BlueController>(context);
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dispositivos Bluetooth'),
-        actions: [
-          IconButton(
-            icon: Icon(controller.bluetoothState == BluetoothState.STATE_ON
-                ? Icons.bluetooth_connected
-                : Icons.bluetooth_disabled),
-            onPressed: () {
-              controller.toggleBluetooth();
-            },
-          ),
-        ],
+        title: const Text('Blue App'),
       ),
-      body: Center(
-        child: controller.connectedDevice == null
-            ? ListView.builder(
-                itemCount: controller.devices.length,
-                itemBuilder: (context, index) {
-                  final device = controller.devices[index];
-                  return ListTile(
-                    title: Text(device.name ?? "Desconocido"),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        controller.connectToDevice(device);
-                      },
-                      child: const Text('Conectar'),
-                    ),
-                  );
-                },
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Conectado a: ${controller.connectedDevice?.name ?? "Desconocido"}'),
-                  const Icon(Icons.bluetooth_connected, size: 50), // Ícono de conexión
-                  ElevatedButton(
-                    onPressed: () {
-                      controller.disconnect();
-                    },
-                    child: const Text('Desconectar'),
-                  ),
-                ],
-              ),
+      body: IndexedStack(
+        index: _selectedIndex, // Usar IndexedStack para mostrar la página seleccionada
+        children: _pages,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: 'Bluetooth'),
+          BottomNavigationBarItem(icon: Icon(Icons.lightbulb), label: 'Control LED'),
+          BottomNavigationBarItem(icon: Icon(Icons.pages), label: 'Página en Blanco'),
+        ],
+        currentIndex: _selectedIndex, // Mantener el índice seleccionado
+        onTap: _onItemTapped, // Manejar el toque en la barra de navegación
       ),
     );
   }
