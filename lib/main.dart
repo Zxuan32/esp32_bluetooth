@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'blue_controller.dart'; // Asegúrate de importar tu BlueController
-import 'package:provider/provider.dart'; // Importa el paquete Provider
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart'; // Importa BluetoothState
+import 'blue_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 void main() => runApp(const MyApp());
 
