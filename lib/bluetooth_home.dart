@@ -26,20 +26,24 @@ class BluetoothHome extends StatelessWidget {
                     ),
                   );
                 }
-                return const SizedBox.shrink(); // Si no es un dispositivo ESP32, no mostrar nada
+                return const SizedBox.shrink();
               },
             )
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('Conectado a: ${controller.connectedDevice?.name ?? "Desconocido"}'),
-                const Icon(Icons.bluetooth_connected, size: 50), // Ícono de conexión
+                const Icon(Icons.bluetooth_connected, size: 50),
                 ElevatedButton(
                   onPressed: () {
                     controller.disconnect();
                   },
                   child: const Text('Desconectar'),
                 ),
+                if (controller.isConnected) // Mostrar mensaje si la conexión fue exitosa
+                  const Text('Conexión exitosa!', style: TextStyle(color: Colors.green)),
+                if (!controller.isConnected) // Mostrar mensaje de error si no se pudo conectar
+                  const Text('No se pudo conectar', style: TextStyle(color: Colors.red)),
               ],
             ),
     );
