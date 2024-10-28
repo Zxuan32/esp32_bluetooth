@@ -6,6 +6,7 @@ class BlueController extends ChangeNotifier {
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
   List<BluetoothDevice> _devices = [];
   BluetoothDevice? connectedDevice;
+  bool isConnected = false; // Variable para controlar el estado de conexión
 
   BlueController() {
     _initBluetooth();
@@ -29,7 +30,6 @@ class BlueController extends ChangeNotifier {
   }
 
   Future<void> _getPairedDevices() async {
-    // Obtiene solo dispositivos que contengan "esp32" en el nombre
     _devices = (await FlutterBluetoothSerial.instance.getBondedDevices())
         .where((device) => device.name?.toLowerCase().contains('esp32') ?? false)
         .toList();
@@ -43,8 +43,7 @@ class BlueController extends ChangeNotifier {
   Future<void> toggleBluetooth() async {
     if (_bluetoothState == BluetoothState.STATE_ON) {
       await FlutterBluetoothSerial.instance.requestDisable();
-    } 
-    else {
+    } else {
       await FlutterBluetoothSerial.instance.requestEnable();
     }
     _bluetoothState = await FlutterBluetoothSerial.instance.state;
@@ -53,12 +52,22 @@ class BlueController extends ChangeNotifier {
   }
 
   Future<void> connectToDevice(BluetoothDevice device) async {
-    connectedDevice = device;
-    notifyListeners();
+    // Aquí intentamos conectar al dispositivo
+    try {
+      BluetoothConnection connection = await BluetoothConnection.toAddress(device.address);
+      connectedDevice = device;
+      isConnected = true; // Actualizar el estado de conexión
+      notifyListeners();
+    } catch (error) {
+      print('Error al conectar: $error');
+      isConnected = false; // Actualizar el estado de conexión
+      notifyListeners();
+    }
   }
 
   void disconnect() {
     connectedDevice = null;
+    isConnected = false; // Actualizar el estado de conexión
     notifyListeners();
   }
 }
