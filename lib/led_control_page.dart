@@ -9,7 +9,7 @@ class LedControlPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final blueController = Provider.of<BlueController>(context);
-    
+
     if (blueController.connectedDevice == null) {
       return const Center(
         child: Text('No hay dispositivo conectado'),
@@ -35,11 +35,11 @@ class LedControlPage extends StatelessWidget {
                     style: const TextStyle(fontSize: 24),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
+                  Switch(
+                    value: ledController.isLedOn,
+                    onChanged: (value) {
                       ledController.toggleLed();
                     },
-                    child: Text(ledController.isLedOn ? 'Apagar LED' : 'Encender LED'),
                   ),
                 ],
               ),
